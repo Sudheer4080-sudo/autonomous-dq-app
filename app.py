@@ -4,8 +4,8 @@ import pandas as pd
 import yaml
 from dq_agent.core import apply_rules
 
-st.set_page_config(page_title="Autonomous DQ", layout="wide")
-st.title("Autonomous Data Quality App")
+st.image("assets/trudata_logo.png", width=200)
+st.markdown("<h1 style='color:#007ACC;'>Trudata: Autonomous Data Quality Agent</h1>", unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs([" Rule Builder", " Run Validator"])
 
@@ -51,7 +51,7 @@ with tab2:
             st.success(" No issues found!")
 
     st.markdown("AI-Powered Rule Suggestions")
-
+    
     ai_csv = st.file_uploader("Upload CSV for AI suggestion", type="csv", key="ai_csv")
     if ai_csv:
         df_ai = pd.read_csv(ai_csv)
@@ -62,3 +62,8 @@ with tab2:
                 yaml_str = yaml.dump(rules_yaml, sort_keys=False)
                 st.code(yaml_str, language="yaml")
                 st.download_button("Download Suggested YAML", data=yaml_str, file_name="suggested_rules.yaml")
+
+    st.markdown("---")
+    st.markdown("<center><small>Powered by <strong>Trudata</strong> • An AutonomousDQ Innovation</small></center>", unsafe_allow_html=True)
+
+           
