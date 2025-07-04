@@ -4,7 +4,7 @@ import pandas as pd
 import yaml
 from dq_agent.core import apply_rules
 
-st.image("assets/trudata_logo.png", width=200)
+st.image("Assets/trudata_logo.png", width=200)
 st.markdown("<h1 style='color:#007ACC;'>Trudata: Autonomous Data Quality Agent</h1>", unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs([" Rule Builder", " Run Validator"])
