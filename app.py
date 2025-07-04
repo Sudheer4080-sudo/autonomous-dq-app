@@ -49,3 +49,16 @@ with tab2:
                 st.warning(f"{issue['rule']}: {len(issue['rows'])} rows")
         else:
             st.success(" No issues found!")
+
+    st.markdown("AI-Powered Rule Suggestions")
+
+    ai_csv = st.file_uploader("Upload CSV for AI suggestion", type="csv", key="ai_csv")
+    if ai_csv:
+        df_ai = pd.read_csv(ai_csv)
+        if st.button("Suggest Rules (AI)"):
+            with st.spinner("Analyzing..."):
+                from dq_agent.suggest_rules import suggest_rules
+                rules_yaml = suggest_rules(df_ai)
+                yaml_str = yaml.dump(rules_yaml, sort_keys=False)
+                st.code(yaml_str, language="yaml")
+                st.download_button("Download Suggested YAML", data=yaml_str, file_name="suggested_rules.yaml")
