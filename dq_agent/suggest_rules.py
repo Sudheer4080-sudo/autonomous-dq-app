@@ -1,22 +1,37 @@
 
 import pandas as pd
-from pandas_profiling import ProfileReport
+from ydata_profiling import ProfileReport
 
-def suggest_rules(df):
-    profile = ProfileReport(df, minimal=True)
-    rules = []
+
+def suggest_rules(df: pd.DataFrame):
+    profile = ProfileReport(df, minimal=True, explorative=True, correlations={"pearson": False})
+    suggestions = {"rules": []}
+
     for col in df.columns:
-        col_rules = {"column": col, "rules": []}
-        if df[col].isnull().sum() == 0:
-            col_rules["rules"].append("not_null")
-        if df[col].is_unique:
-            col_rules["rules"].append("unique")
-        if pd.api.types.is_numeric_dtype(df[col]):
-            col_rules["rules"].append({
+        col_info = df[col]
+        col_rules = []
+
+        if col_info.isnull().any():
+            col_rules.append("not_null")
+
+        if col_info.is_unique:
+            col_rules.append("unique")
+
+        if pd.api.types.is_numeric_dtype(col_info):
+            col_rules.append({
                 "range": {
-                    "min": float(df[col].min()),
-                    "max": float(df[col].max())
+                    "min": float(col_info.min()),
+                    "max": float(col_info.max())
                 }
             })
-        rules.append(col_rules)
-    return {"rules": rules}
+
+        if pd.api.types.is_string_dtype(col_info) and col_info.str.match(r'^\w+$').mean() > 0.8:
+            col_rules.append({"pattern": r"^\w+$"})
+
+        if col_rules:
+            suggestions["rules"].append({
+                "column": col,
+                "rules": col_rules
+            })
+
+    return suggestions
