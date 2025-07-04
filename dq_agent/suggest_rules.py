@@ -1,37 +1,37 @@
 
 import pandas as pd
-from ydata_profiling import ProfileReport
 
-
-def suggest_rules(df: pd.DataFrame):
-    profile = ProfileReport(df, minimal=True, explorative=True, correlations={"pearson": False})
+def suggest_rules(df):
     suggestions = {"rules": []}
 
     for col in df.columns:
-        col_info = df[col]
-        col_rules = []
+        rules = []
 
-        if col_info.isnull().any():
-            col_rules.append("not_null")
+        # Rule: not null
+        if df[col].isnull().sum() == 0:
+            rules.append("not_null")
 
-        if col_info.is_unique:
-            col_rules.append("unique")
+        # Rule: unique
+        if df[col].is_unique:
+            rules.append("unique")
 
-        if pd.api.types.is_numeric_dtype(col_info):
-            col_rules.append({
+        # Rule: numeric range
+        if pd.api.types.is_numeric_dtype(df[col]):
+            rules.append({
                 "range": {
-                    "min": float(col_info.min()),
-                    "max": float(col_info.max())
+                    "min": float(df[col].min()),
+                    "max": float(df[col].max())
                 }
             })
 
-        if pd.api.types.is_string_dtype(col_info) and col_info.str.match(r'^\w+$').mean() > 0.8:
-            col_rules.append({"pattern": r"^\w+$"})
+        # Rule: simple pattern for emails or identifiers
+        if pd.api.types.is_string_dtype(df[col]):
+            if df[col].str.contains("@").mean() > 0.5:
+                rules.append({"pattern": r"[^@]+@[^@]+\.[^@]+"})
 
-        if col_rules:
-            suggestions["rules"].append({
-                "column": col,
-                "rules": col_rules
-            })
+        suggestions["rules"].append({
+            "column": col,
+            "rules": rules
+        })
 
     return suggestions

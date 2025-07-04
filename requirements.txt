@@ -3,4 +3,3 @@ pandas
 pyyaml
 streamlit
 
-ydata-profiling
