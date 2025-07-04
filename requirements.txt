@@ -2,3 +2,5 @@
 pandas
 pyyaml
 streamlit
+
+pandas-profiling
