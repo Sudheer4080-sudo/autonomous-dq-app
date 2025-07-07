@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yaml
 from dq_agent.core import apply_rules
+from dq_agent.db_connector import load_from_postgres, load_from_mysql
 
 st.set_page_config(page_title="Trudata: Autonomous DQ Agent", layout="wide")
 
@@ -11,6 +12,7 @@ st.markdown("## Trudata: Autonomous Data Quality Agent")
 
 tab1, tab2 = st.tabs(["🧩 Rule Builder", "🧪 Run Validator"])
 
+# ------------------- Tab 1: Rule Builder -------------------
 with tab1:
     st.markdown("### 📤 Upload CSV for Rule Builder")
     uploaded_file = st.file_uploader("Choose your data file", type="csv")
@@ -49,13 +51,58 @@ with tab1:
             st.code(yaml_str, language="yaml")
             st.download_button("⬇️ Download Rules YAML", data=yaml_str, file_name="rules.yaml")
 
+
+# ------------------- Tab 2: Run Validator -------------------
 with tab2:
     st.markdown("### 🧪 Run Data Validator")
-    csv = st.file_uploader("Upload CSV to validate", type="csv", key="dq_csv")
-    yml = st.file_uploader("Upload YAML config", type=["yaml", "yml"])
 
-    if csv and yml:
-        df = pd.read_csv(csv)
+    st.markdown("### 🔌 Data Source")
+    source_type = st.selectbox("Choose data source", ["Upload CSV", "PostgreSQL", "MySQL"])
+
+    df = None
+
+    if source_type == "Upload CSV":
+        csv = st.file_uploader("Upload CSV to validate", type="csv", key="dq_csv")
+        if csv:
+            df = pd.read_csv(csv)
+
+    elif source_type == "PostgreSQL":
+        st.markdown("#### 🔐 PostgreSQL Connection")
+        col1, col2 = st.columns(2)
+        pg_host = col1.text_input("Host")
+        pg_db = col2.text_input("Database")
+        pg_user = col1.text_input("User")
+        pg_pass = col2.text_input("Password", type="password")
+        pg_table = st.text_input("Table name")
+
+        if st.button("🔄 Load from PostgreSQL"):
+            try:
+                df = load_from_postgres(pg_host, pg_db, pg_user, pg_pass, pg_table)
+                st.success("Data loaded successfully!")
+                st.dataframe(df.head())
+            except Exception as e:
+                st.error(f"Failed to connect: {e}")
+
+    elif source_type == "MySQL":
+        st.markdown("#### 🔐 MySQL Connection")
+        col1, col2 = st.columns(2)
+        my_host = col1.text_input("Host")
+        my_db = col2.text_input("Database")
+        my_user = col1.text_input("User")
+        my_pass = col2.text_input("Password", type="password")
+        my_table = st.text_input("Table name")
+
+        if st.button("🔄 Load from MySQL"):
+            try:
+                df = load_from_mysql(my_host, my_db, my_user, my_pass, my_table)
+                st.success("Data loaded successfully!")
+                st.dataframe(df.head())
+            except Exception as e:
+                st.error(f"Failed to connect: {e}")
+
+    # --- YAML Config Upload ---
+    yml = st.file_uploader("Upload YAML config", type=["yaml", "yml"])
+    if df is not None and yml:
         config = yaml.safe_load(yml)
         st.markdown("#### 🔍 Data Preview")
         st.dataframe(df.head())
@@ -66,6 +113,7 @@ with tab2:
         else:
             st.success("✅ No issues found!")
 
+    # --- AI Suggestions ---
     st.markdown("---")
     st.markdown("### 🤖 AI-Powered Rule Suggestions")
     ai_csv = st.file_uploader("Upload CSV for AI analysis", type="csv", key="ai_csv")
