@@ -16,7 +16,7 @@ tab1, tab2 = st.tabs(["🧩 Rule Builder", "🧪 Run Validator"])
 with tab1:
     st.markdown("### 📤 Upload CSV for Rule Builder")
     uploaded_file = st.file_uploader("Choose your data file", type="csv")
-    
+
     if uploaded_file:
         df = pd.read_csv(uploaded_file)
         st.success("CSV uploaded successfully!")
@@ -55,7 +55,6 @@ with tab1:
 # ------------------- Tab 2: Run Validator -------------------
 with tab2:
     st.markdown("### 🧪 Run Data Validator")
-
     st.markdown("### 🔌 Data Source")
     source_type = st.selectbox("Choose data source", ["Upload CSV", "PostgreSQL", "MySQL"])
 
@@ -113,20 +112,19 @@ with tab2:
         else:
             st.success("✅ No issues found!")
 
-    # --- AI Suggestions ---
-    st.markdown("---")
-    st.markdown("### 🤖 AI-Powered Rule Suggestions")
-    ai_csv = st.file_uploader("Upload CSV for AI analysis", type="csv", key="ai_csv")
-    if ai_csv:
-        df_ai = pd.read_csv(ai_csv)
-        if st.button("Suggest Rules (AI)"):
+    # --- AI Rule Suggestion from any loaded df (CSV or DB) ---
+    if df is not None:
+        st.markdown("---")
+        st.markdown("### 🤖 AI-Powered Rule Suggestions")
+        if st.button("Suggest Rules (AI)", key="ai_suggest"):
             with st.spinner("Analyzing with AI..."):
                 from dq_agent.suggest_rules import suggest_rules
-                rules_yaml = suggest_rules(df_ai)
+                rules_yaml = suggest_rules(df)
                 yaml_str = yaml.dump(rules_yaml, sort_keys=False)
                 st.markdown("#### 🧾 Suggested Rules")
                 st.code(yaml_str, language="yaml")
                 st.download_button("⬇️ Download Suggested YAML", data=yaml_str, file_name="suggested_rules.yaml")
+
 
 # --- Footer ---
 st.markdown("---")
