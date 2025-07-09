@@ -15,7 +15,11 @@ st.set_page_config(page_title="Trudata: Autonomous DQ Agent", layout="wide")
 page = st.sidebar.selectbox("📂 Select Page", ["Dashboard", "Data Quality Agent"])
 
 if page == "Dashboard":
-    dashboard.run(st.session_state.get("metrics"))
+    dashboard.run(
+    metrics_data=st.session_state.get("metrics"),
+    rule_issues=st.session_state.get("rule_issues")
+)
+
 else:
     st.image("Assets/trudata_logo.png", width=200)
     st.markdown("## Trudata: Autonomous Data Quality Agent")
