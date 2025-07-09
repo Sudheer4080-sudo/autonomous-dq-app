@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import yaml
+import dashboard
 from dq_agent.core import apply_rules
 from dq_agent.db_connector import load_from_postgres, load_from_mysql
 
@@ -10,7 +11,13 @@ st.set_page_config(page_title="Trudata: Autonomous DQ Agent", layout="wide")
 st.image("Assets/trudata_logo.png", width=200)
 st.markdown("## Trudata: Autonomous Data Quality Agent")
 
-tab1, tab2 = st.tabs(["🧩 Rule Builder", "🧪 Run Validator"])
+page = st.sidebar.selectbox("📂 Select Page", ["Dashboard", "Data Quality Agent"])
+
+if page == "Dashboard":
+    dashboard.run()
+else:
+    # Your existing DQ workflow code stays here
+
 
 # ------------------- Tab 1: Rule Builder -------------------
 with tab1:
@@ -43,6 +50,31 @@ with tab1:
                     rules.append({"pattern": pattern})
                 if rules:
                     rule_configs.append({"column": col, "rules": rules})
+
+        import yaml
+
+yaml_obj = {"rules": rule_configs}
+config = yaml_obj  # mimic loaded YAML structure
+
+# Apply rules
+issues = apply_rules(df, config)
+
+# Calculate live metrics
+total = len(df)
+failed = len(issues)
+quality_score = round((1 - failed / total) * 100, 2) if total > 0 else 0
+active_policies = len(config["rules"])
+compliance_score = "100%" if quality_score >= 95 else "85%"
+
+# Save for dashboard
+st.session_state["metrics"] = {
+    "Data Assets": str(total),
+    "Quality Score": f"{quality_score}%",
+    "Active Policies": str(active_policies),
+    "Compliance": compliance_score
+}
+
+st.warning(f"⚠️ {failed} rows failed validation")
 
         if rule_configs:
             yaml_obj = {"rules": rule_configs}
