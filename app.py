@@ -1,9 +1,12 @@
-
 import streamlit as st
 import pandas as pd
 import yaml
+import os
+import sys
 
-from dq_agent.core import apply_rules
+import dashboard  # ✅ Fix dashboard reference
+
+from dq_agent.core import apply_rules  # ✅ Corrected folder name
 from dq_agent.db_connector import load_from_postgres, load_from_mysql
 
 
