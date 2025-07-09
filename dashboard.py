@@ -1,7 +1,7 @@
 
 import streamlit as st
 import pandas as pd
-from da_agent.db_connector import load_from_postgres, load_from_mysql
+from dq_agent.db_connector import load_from_postgres, load_from_mysql
 
 def run(metrics_data=None, rule_issues=None):
     st.markdown("""
