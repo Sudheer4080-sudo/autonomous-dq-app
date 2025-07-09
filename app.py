@@ -59,6 +59,8 @@ else:
                 config = yaml_obj
 
                 issues = apply_rules(df, config)
+                st.session_state["rule_issues"] = issues
+
 
                 total = len(df)
                 failed = len(issues)
