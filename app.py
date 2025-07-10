@@ -7,7 +7,7 @@ import sys
 
 import dashboard  # ✅ Fix dashboard reference
 
-from dq_agent.core import apply_rules  # ✅ Rule engine logic
+from dq_agent.core.rules_engine import apply_rules # ✅ Rule engine logic
 from dq_agent.db_connector_ui import database_connector_ui  # ✅ Dynamic DB UI
 
 st.set_page_config(page_title="Trudata: Autonomous DQ Agent", layout="wide")
