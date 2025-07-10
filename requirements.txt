@@ -3,4 +3,13 @@ pandas
 pyyaml
 streamlit
 sqlalchemy
+psycopg2-binary
+pymysql
+mysql-connector-python
+snowflake-connector-python
+pyodbc
+cx_Oracle
+redshift-connector
+pyathena
+google-cloud-bigquery
 
