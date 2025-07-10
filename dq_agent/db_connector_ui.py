@@ -1,7 +1,7 @@
 
 import streamlit as st
 import pandas as pd
-from core import db_connectors
+from dq_agent.core import db_connectors
 
 def database_connector_ui():
     st.header("🔗 Connect to a Data Source")
